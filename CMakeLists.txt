@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.10)
+project(sql_pool)
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+find_package(Threads REQUIRED)
+find_package(FreeTDS REQUIRED)
+
+include_directories(include)
+
+LIST(APPEND srcs
+  src/SqlClient.cpp
+  src/SqlConnection.cpp
+  src/SqlConnectionFactory.cpp)
+
+
+# Define library
+add_library(sql_pool STATIC ${srcs})
+
+# Install headers
