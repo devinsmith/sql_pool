@@ -17,4 +17,4 @@ LIST(APPEND srcs
 # Define library
 add_library(sql_pool STATIC ${srcs})
 
-# Install headers
+target_include_directories(sql_pool PUBLIC ${PROJECT_SOURCE_DIR}/include)
