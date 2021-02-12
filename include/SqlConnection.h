@@ -23,21 +23,9 @@
 #include <sqlfront.h>
 #include <sybdb.h>
 
+#include "SqlParams.h"
+
 namespace drs {
-
-struct db_params {
-  const char *name;
-  unsigned char status;
-  int type;
-  int maxlen;
-  int datalen;
-  const void *value;
-};
-
-#define INT32_TYPE 1
-#define STRING_TYPE 2
-#define BOOL_TYPE 3
-#define BIT_TYPE 4
 
 class SqlConnection {
 public:

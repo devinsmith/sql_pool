@@ -19,9 +19,10 @@
 
 #include <string>
 
+#include "SqlParams.h"
+
 namespace drs {
 
-struct db_params;
 class SqlConnection;
 
 // A wrapper around SqlConnections that uses pooling.
