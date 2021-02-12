@@ -45,6 +45,7 @@ public:
   void ExecDML(const char *dml);
 
   bool NextRow();
+  bool NextResult();
 
   // Data extraction
   int GetOrdinal(const char *colName);

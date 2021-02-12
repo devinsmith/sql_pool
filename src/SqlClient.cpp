@@ -70,6 +70,11 @@ bool SqlClient::NextRow()
   return m_conn->NextRow();
 }
 
+bool SqlClient::NextResult()
+{
+  return m_conn->NextResult();
+}
+
 std::string SqlClient::GetStringCol(int col)
 {
   return m_conn->GetStringCol(col);
