@@ -76,12 +76,12 @@ public:
 
   // Execute a stored procedure where results/resultsets are expected.
   void ExecStoredProc(const char *proc, struct db_params *params,
-    int parm_count);
+    size_t parm_count);
 
   // Execute a stored procedure where results/resultsets are NOT expected
   // or where results/resultsets can be ignored.
   void ExecNonQuery(const char *proc, struct db_params *params,
-    int parm_count);
+    size_t parm_count);
 
   // Move to next result set.
   bool NextResult();

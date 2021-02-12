@@ -40,7 +40,7 @@ public:
   // You should not need to call this method directly, but you can.
   void Connect();
 
-  void ExecStoredProc(const char *proc, struct db_params *params, int parm_count);
+  void ExecStoredProc(const char *proc, struct db_params *params, size_t parm_count);
   void ExecSql(const char *sql);
   void ExecDML(const char *dml);
 

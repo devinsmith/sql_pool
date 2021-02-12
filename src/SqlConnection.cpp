@@ -444,7 +444,7 @@ SqlConnection::IsNullCol(int col)
 }
 
 void SqlConnection::ExecStoredProc(const char *proc, struct db_params *params,
-    int parm_count)
+    size_t parm_count)
 {
   int res, i;
 
@@ -496,7 +496,7 @@ void SqlConnection::ExecStoredProc(const char *proc, struct db_params *params,
 }
 
 void SqlConnection::ExecNonQuery(const char *proc, struct db_params *params,
-    int parm_count)
+    size_t parm_count)
 {
   int i;
 

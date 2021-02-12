@@ -47,7 +47,7 @@ void SqlClient::Connect()
       m_user, m_pass, m_server, m_database);
 }
 
-void SqlClient::ExecStoredProc(const char *proc, struct db_params *params, int parm_count)
+void SqlClient::ExecStoredProc(const char *proc, struct db_params *params, size_t parm_count)
 {
   Connect();
   m_conn->ExecStoredProc(proc, params, parm_count);
