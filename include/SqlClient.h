@@ -42,8 +42,11 @@ public:
   void Connect();
 
   void ExecStoredProc(const char *proc, struct db_params *params, size_t parm_count);
+  void ExecNonQuery(const char *proc, struct db_params *params, size_t parm_count);
   void ExecSql(const char *sql);
   void ExecDML(const char *dml);
+
+  void Dispose();
 
   bool NextRow();
   bool NextResult();

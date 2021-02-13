@@ -53,6 +53,17 @@ void SqlClient::ExecStoredProc(const char *proc, struct db_params *params, size_
   m_conn->ExecStoredProc(proc, params, parm_count);
 }
 
+void SqlClient::ExecNonQuery(const char *proc, struct db_params *params, size_t parm_count)
+{
+  Connect();
+  m_conn->ExecNonQuery(proc, params, parm_count);
+}
+
+void SqlClient::Dispose()
+{
+  m_conn->Dispose();
+}
+
 void SqlClient::ExecSql(const char *sql)
 {
   Connect();
