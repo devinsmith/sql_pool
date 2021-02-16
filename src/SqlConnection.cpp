@@ -160,6 +160,11 @@ void sql_startup()
   dbsetlogintime(5);
 }
 
+void sql_shutdown()
+{
+  dbexit();
+}
+
 SqlConnection::~SqlConnection()
 {
   Disconnect();

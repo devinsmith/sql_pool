@@ -106,6 +106,7 @@ private:
 };
 
 void sql_startup();
+void sql_shutdown();
 
 }
 
