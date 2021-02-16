@@ -22,10 +22,6 @@
 
 namespace drs {
 
-SqlConnectionFactory::SqlConnectionFactory()
-{
-  sql_startup();
-}
 
 void SqlConnectionFactory::release(SqlConnection *c)
 {

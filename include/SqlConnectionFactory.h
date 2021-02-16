@@ -45,7 +45,7 @@ public:
   void release(SqlConnection*);
 
 private:
-  SqlConnectionFactory();
+  SqlConnectionFactory() = default;
 
   std::mutex _mutex;
   std::list<SqlConnection*> sql_connections;
