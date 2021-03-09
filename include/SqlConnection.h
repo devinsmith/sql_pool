@@ -93,7 +93,7 @@ public:
 
 private:
   void run_initial_query();
-  std::string fix_server(const std::string& str);
+  static std::string fix_server(const std::string& str);
 
   std::string _user;
   std::string _pass;
