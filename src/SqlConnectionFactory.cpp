@@ -38,8 +38,7 @@ SqlConnection* SqlConnectionFactory::acquire(const std::string& user,
 
   {
     std::lock_guard<std::mutex> locker(_mutex);
-    for (std::list<SqlConnection*>::iterator it = sql_connections.begin();
-        it != sql_connections.end(); ++it) {
+    for (auto it = sql_connections.begin(); it != sql_connections.end(); ++it) {
       c = *it;
       if (c->Server() == server && c->Database() == database) {
         sql_connections.erase(it);
@@ -50,7 +49,7 @@ SqlConnection* SqlConnectionFactory::acquire(const std::string& user,
 
   // Make new connection.
   //
-  printf("ConnectionFactory:: Making a new connection: %s\n", server.c_str());
+  printf("ConnectionFactory:: Making a new connection: %s - %s\n", server.c_str(), database.c_str());
 
   c = new SqlConnection(user, pass, server, database);
   c->Connect();
