@@ -561,10 +561,23 @@ std::string SqlConnection::fix_server(const std::string& str)
   if (clean_server.compare(0, tcp_prefix.size(), tcp_prefix) == 0)
     clean_server = clean_server.substr(tcp_prefix.size());
 
-  // Some people use commas instead of colon to seperate the port number.
+  // Some people use commas instead of colon to separate the port number.
   std::replace(clean_server.begin(), clean_server.end(), ',', ':');
 
   return clean_server;
+}
+
+std::vector<std::string> SqlConnection::GetAllColumnNames()
+{
+  int total_cols = dbnumcols(_dbHandle);
+
+  std::vector<std::string> columns(total_cols);
+
+  for (int i = 0; i < total_cols; i++) {
+    columns.emplace_back(dbcolname(_dbHandle, i + 1));
+  }
+
+  return columns;
 }
 
 

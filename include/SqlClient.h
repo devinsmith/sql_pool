@@ -18,6 +18,7 @@
 #define __DRS_SQLCLIENT_H__
 
 #include <string>
+#include <vector>
 
 #include "SqlParams.h"
 
@@ -53,6 +54,7 @@ public:
 
   // Data extraction
   int GetOrdinal(const char *colName);
+  std::vector<std::string> GetAllColumnNames();
 
   std::string GetStringCol(int col);
   std::string GetStringColByName(const char *colName);

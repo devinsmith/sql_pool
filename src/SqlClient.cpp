@@ -116,4 +116,9 @@ bool SqlClient::IsNullCol(int col)
   return m_conn->IsNullCol(col);
 }
 
+std::vector<std::string> SqlClient::GetAllColumnNames()
+{
+  return m_conn->GetAllColumnNames();
+}
+
 }

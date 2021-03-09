@@ -18,6 +18,7 @@
 #define __DRS_SQLCONNECTION_H__
 
 #include <string>
+#include <vector>
 
 #define MSDBLIB 1
 #include <sqlfront.h>
@@ -79,6 +80,8 @@ public:
 
   // Data extraction
   int GetOrdinal(const char *colName);
+
+  std::vector<std::string> GetAllColumnNames();
 
   std::string GetStringCol(int col);
   std::string GetStringColByName(const char *colName);
