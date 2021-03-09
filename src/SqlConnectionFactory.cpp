@@ -30,7 +30,7 @@ void SqlConnectionFactory::release(SqlConnection *c)
 }
 
 
-SqlConnection* SqlConnectionFactory::aquire(const std::string& user,
+SqlConnection* SqlConnectionFactory::acquire(const std::string& user,
     const std::string& pass, const std::string& server,
     const std::string& database)
 {

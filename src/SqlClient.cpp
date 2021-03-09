@@ -43,7 +43,7 @@ void SqlClient::Connect()
   if (m_conn != nullptr)
     return;
 
-  m_conn = SqlConnectionFactory::instance().aquire(
+  m_conn = SqlConnectionFactory::instance().acquire(
       m_user, m_pass, m_server, m_database);
 }
 
