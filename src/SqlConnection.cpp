@@ -52,8 +52,6 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
    * If the severity is something other than 0 or the msg number is
    * 0 (user informational messages).
    */
-  _error.clear();
-
   if (severity >= 0 || msgno == 0) {
     /*
      * If the message was something other than informational, and
@@ -61,7 +59,7 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
      * stderr with a little pre-amble information.
      */
     if (msgno > 0 && severity > 0) {
-      char *database;
+      _error.clear();
 
       // Incorporate format?
       _error += "Msg ";
@@ -84,7 +82,7 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
         _error += std::to_string(line);
       }
       _error += "\n";
-      database = dbname(dbproc);
+      char *database = dbname(dbproc);
       if (database != nullptr && *database != '\0') {
         _error += "Database '";
         _error += database;
@@ -119,10 +117,16 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
     return 0;
   }
 
-  if (severity) {
-    return 1;
+  if (msgno == 3621) {
+    // The statement has been terminated.
+    if (_error.back() != '\n') {
+      _error.append(1, '\n');
+    }
+    _error += msgtext;
+    severity = 1;
   }
-  return 0;
+
+  return severity > 0;
 }
 
 extern "C" int
