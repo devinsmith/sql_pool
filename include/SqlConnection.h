@@ -96,6 +96,7 @@ public:
 
 private:
   void run_initial_query();
+  void execute_proc_common(const char *proc, struct db_params *params, size_t parm_count);
   static std::string fix_server(const std::string& str);
 
   std::string _user;

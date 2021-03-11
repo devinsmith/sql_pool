@@ -34,7 +34,7 @@ sql_db_msg_handler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
   if (msgno == 5701 || msgno == 5703 || msgno == 5704)
     return 0;
 
-  SqlConnection *conn = reinterpret_cast<SqlConnection *>(dbgetuserdata(dbproc));
+  auto *conn = reinterpret_cast<SqlConnection *>(dbgetuserdata(dbproc));
 
   if (conn != nullptr) {
     return conn->MsgHandler(dbproc, msgno, msgstate, severity, msgtext, srvname,
@@ -74,7 +74,7 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
       _error += srvname;
       _error += "'";
 
-      if (procname != NULL && *procname != '\0') {
+      if (procname != nullptr && *procname != '\0') {
         _error += ", Procedure '";
         _error += procname;
         _error += "'";
@@ -85,7 +85,7 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
       }
       _error += "\n";
       database = dbname(dbproc);
-      if (database != NULL && *database != '\0') {
+      if (database != nullptr && *database != '\0') {
         _error += "Database '";
         _error += database;
         _error += "'\n";
@@ -404,10 +404,10 @@ SqlConnection::GetInt32Col(int col)
   if (coltype == SYBINT4) {
     memcpy(&ret, dbdata(_dbHandle, col + 1), srclen);
   } else if (coltype == SYBNUMERIC) {
-    dbconvert(NULL, SYBNUMERIC, (BYTE *)dbdata(_dbHandle, col + 1), -1,
+    dbconvert(nullptr, SYBNUMERIC, (BYTE *)dbdata(_dbHandle, col + 1), -1,
       SYBINT4, (BYTE *)&ret, 4);
   } else {
-    dbconvert(NULL, coltype, (BYTE *)dbdata(_dbHandle, col + 1), -1,
+    dbconvert(nullptr, coltype, (BYTE *)dbdata(_dbHandle, col + 1), -1,
       SYBINT4, (BYTE *)&ret, 4);
   }
 
@@ -451,48 +451,9 @@ SqlConnection::IsNullCol(int col)
 void SqlConnection::ExecStoredProc(const char *proc, struct db_params *params,
     size_t parm_count)
 {
-  int res, i;
+  execute_proc_common(proc, params, parm_count);
 
-  Connect();
-
-  Dispose();
-
-  _fetched_rows = false;
-  _fetched_results = false;
-
-  if (dbrpcinit(_dbHandle, proc, 0) == FAIL)
-    throw std::runtime_error("Failed to init stored procedure");
-
-  for (i = 0; i < parm_count; i++) {
-    int real_type = 0;
-
-    switch (params[i].type) {
-    case BIT_TYPE:
-      real_type = SYBBITN;
-    case INT32_TYPE:
-      real_type = SYBINT4;
-      break;
-    case STRING_TYPE:
-      real_type = SYBCHAR;
-      break;
-    default:
-      throw std::runtime_error("Unknown stored procedure parameter type");
-    }
-    if (dbrpcparam(_dbHandle, params[i].name, params[i].status,
-        real_type, params[i].maxlen, params[i].datalen,
-        (BYTE *)params[i].value) == FAIL) {
-      throw std::runtime_error("Failed to set parameter");
-    }
-  }
-
-  if (dbrpcsend(_dbHandle) == FAIL)
-    throw std::runtime_error("Failed to send RPC");
-
-  /* Wait for the server to return */
-  if (dbsqlok(_dbHandle) == FAIL)
-    throw std::runtime_error(_error);
-
-  res = dbresults(_dbHandle);
+  int res = dbresults(_dbHandle);
   if (res == FAIL)
     throw std::runtime_error("Failed to get results");
 
@@ -503,47 +464,7 @@ void SqlConnection::ExecStoredProc(const char *proc, struct db_params *params,
 void SqlConnection::ExecNonQuery(const char *proc, struct db_params *params,
     size_t parm_count)
 {
-  int i;
-
-  Connect();
-
-  Dispose();
-
-  _fetched_rows = false;
-  _fetched_results = false;
-
-  if (dbrpcinit(_dbHandle, proc, 0) == FAIL)
-    throw std::runtime_error("Failed to init stored procedure");
-
-  for (i = 0; i < parm_count; i++) {
-    int real_type = 0;
-
-    switch (params[i].type) {
-    case BIT_TYPE:
-      real_type = SYBBITN;
-    case INT32_TYPE:
-      real_type = SYBINT4;
-      break;
-    case STRING_TYPE:
-      real_type = SYBCHAR;
-      break;
-    default:
-      throw std::runtime_error("Unknown stored procedure parameter type");
-    }
-    if (dbrpcparam(_dbHandle, params[i].name, params[i].status,
-        real_type, params[i].maxlen, params[i].datalen,
-        (BYTE *)params[i].value) == FAIL) {
-      throw std::runtime_error("Failed to set parameter");
-    }
-  }
-
-  if (dbrpcsend(_dbHandle) == FAIL)
-    throw std::runtime_error("Failed to send RPC");
-
-  /* Wait for the server to return */
-  if (dbsqlok(_dbHandle) == FAIL)
-    throw std::runtime_error("Failed to get SQL");
-
+  execute_proc_common(proc, params, parm_count);
   Dispose();
 }
 
@@ -578,6 +499,58 @@ std::vector<std::string> SqlConnection::GetAllColumnNames()
   }
 
   return columns;
+}
+
+void SqlConnection::execute_proc_common(const char *proc, struct db_params *params, size_t parm_count)
+{
+  Connect();
+
+  Dispose();
+
+  _fetched_rows = false;
+  _fetched_results = false;
+
+  if (dbrpcinit(_dbHandle, proc, 0) == FAIL) {
+    std::string error = "Failed to init stored procedure: ";
+    error += proc;
+    throw std::runtime_error(error);
+  }
+
+  for (int i = 0; i < parm_count; i++) {
+    int real_type = 0;
+
+    switch (params[i].type) {
+      case BIT_TYPE:
+        real_type = SYBBITN;
+      case INT32_TYPE:
+        real_type = SYBINT4;
+        break;
+      case STRING_TYPE:
+        real_type = SYBCHAR;
+        break;
+      default:
+        throw std::runtime_error("Unknown stored procedure parameter type");
+    }
+    if (dbrpcparam(_dbHandle, params[i].name, params[i].status,
+                   real_type, params[i].maxlen, params[i].datalen,
+                   (BYTE *)params[i].value) == FAIL) {
+      std::string error = "Failed to set parameter ";
+      if (params[i].name != nullptr) {
+        error += params[i].name;
+        error.append(1, ' ');
+      }
+      error += "on procedure ";
+      error += proc;
+      throw std::runtime_error(error);
+    }
+  }
+
+  if (dbrpcsend(_dbHandle) == FAIL)
+    throw std::runtime_error("Failed to send RPC");
+
+  /* Wait for the server to return */
+  if (dbsqlok(_dbHandle) == FAIL)
+    throw std::runtime_error(_error);
 }
 
 
