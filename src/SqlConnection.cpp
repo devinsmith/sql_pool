@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 Devin Smith <devin@devinsmith.net>
+ * Copyright (c) 2012-2021 Devin Smith <devin@devinsmith.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,8 @@
 
 namespace drs {
 
+// Sadly, FreeTDS does not seem to check the return value of this message
+// handler.
 extern "C" int
 sql_db_msg_handler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
     int severity, char *msgtext, char *srvname, char *procname, int line)
@@ -90,12 +92,17 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
       }
       _error += msgtext;
     } else {
-      /*
-       * Otherwise, it is just an informational (e.g. print) message
-       * from the server, so send it to stdout.
-       */
+
+      if (_error.back() != '\n') {
+        _error.append(1, '\n');
+      }
+
       _error += msgtext;
-      severity = 0;
+      if (msgno == 3621) {
+        severity = 1;
+      } else {
+        severity = 0;
+      }
     }
   }
 
@@ -117,15 +124,6 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
     return 0;
   }
 
-  if (msgno == 3621) {
-    // The statement has been terminated.
-    if (_error.back() != '\n') {
-      _error.append(1, '\n');
-    }
-    _error += msgtext;
-    severity = 1;
-  }
-
   return severity > 0;
 }
 
@@ -133,23 +131,8 @@ extern "C" int
 sql_db_err_handler(DBPROCESS *dbproc, int severity, int dberr,
     int oserr, char *dberrstr, char *oserrstr)
 {
-  /*
-   * For server messages, cancel the query and rely on the
-   * message handler to spew the appropriate error messages out.
-   */
-
-  /* Can we trust that all 537 errors will go to the msg handler? Not sure. */
-  if (dberr == SYBESMSG || dberr == 537 || dberr == SYBEVERDOWN)
-    return INT_CANCEL;
-
-  if (dberr == SYBEBBCI) {
-    /* int batch = bcp_getbatchsize(dbproc);
-     * log_msg(1, "%d rows sent to SQL Server.\n", sent += batch);
-     */
-    // Why cancel here?
-    return INT_CANCEL;
-  }
-
+  // For server messages, cancel the query and rely on the
+  // message handler to capture the appropriate error message.
   return INT_CANCEL;
 }
 
@@ -219,6 +202,9 @@ void SqlConnection::Disconnect()
 
 void SqlConnection::Dispose()
 {
+  // We're done, so clear our error state.
+  _error.clear();
+
   // Did we already fetch all result sets?
   if (_fetched_results)
     return;
@@ -343,14 +329,11 @@ SqlConnection::GetOrdinal(const char *colName)
 std::string
 SqlConnection::GetStringCol(int col)
 {
-  DBINT srclen;
-  int coltype;
-
   if (col > dbnumcols(_dbHandle))
-    throw std::runtime_error("Requested string on non existant column");
+    throw std::runtime_error("Requested string on nonexistent column");
 
-  coltype = dbcoltype(_dbHandle, col + 1);
-  srclen = dbdatlen(_dbHandle, col + 1);
+  int coltype = dbcoltype(_dbHandle, col + 1);
+  DBINT srclen = dbdatlen(_dbHandle, col + 1);
 
   if (coltype == SYBDATETIME) {
     DBDATETIME data;
@@ -443,12 +426,10 @@ SqlConnection::GetMoneyCol(int col, int *dol, int *cen)
 bool
 SqlConnection::IsNullCol(int col)
 {
-  DBINT srclen;
-
   if (col > dbnumcols(_dbHandle))
     return true;
 
-  srclen = dbdatlen(_dbHandle, col + 1);
+  DBINT srclen = dbdatlen(_dbHandle, col + 1);
   return srclen <= 0;
 }
 
@@ -552,8 +533,15 @@ void SqlConnection::execute_proc_common(const char *proc, struct db_params *para
   if (dbrpcsend(_dbHandle) == FAIL)
     throw std::runtime_error("Failed to send RPC");
 
-  /* Wait for the server to return */
+  // Wait for the server to return
   if (dbsqlok(_dbHandle) == FAIL)
+    throw std::runtime_error(_error);
+
+  // FreeTDS's implementation of dblib does not always process the result of
+  // of the message handler. For instance there are situations where an error
+  // has occurred but dbsqlok returned success. In these situations we need to
+  // check the actual _error property and throw if it is not blank.
+  if (!_error.empty())
     throw std::runtime_error(_error);
 }
 
