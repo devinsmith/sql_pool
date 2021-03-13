@@ -294,8 +294,13 @@ void SqlConnection::ExecSql(const char *sql)
   if (dbcmd(_dbHandle, sql) == FAIL)
     throw std::runtime_error("Failed to submit command to freetds");
 
-  if (dbsqlexec(_dbHandle) == FAIL)
-    throw std::runtime_error("Failed to execute SQL");
+  if (dbsqlexec(_dbHandle) == FAIL) {
+    if (!_error.empty()) {
+      throw std::runtime_error(_error);
+    } else {
+      throw std::runtime_error("Failed to execute SQL");
+    }
+  }
 
   int res = dbresults(_dbHandle);
   if (res == FAIL)
