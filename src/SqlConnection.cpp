@@ -477,7 +477,8 @@ std::vector<std::string> SqlConnection::GetAllColumnNames()
 {
   int total_cols = dbnumcols(_dbHandle);
 
-  std::vector<std::string> columns(total_cols);
+  std::vector<std::string> columns;
+  columns.reserve(total_cols);
 
   for (int i = 0; i < total_cols; i++) {
     columns.emplace_back(dbcolname(_dbHandle, i + 1));
