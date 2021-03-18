@@ -67,10 +67,17 @@ public:
   void ExecStoredProc(const char *proc, struct db_params *params,
     size_t parm_count);
 
+  // Execute a stored procedure where results/resultsets are expected.
+  void ExecStoredProc(const char *proc, const std::vector<db_param>& params);
+
   // Execute a stored procedure where results/resultsets are NOT expected
   // or where results/resultsets can be ignored.
   void ExecNonQuery(const char *proc, struct db_params *params,
     size_t parm_count);
+
+  // Execute a stored procedure where results/resultsets are NOT expected
+  // or where results/resultsets can be ignored.
+  void ExecNonQuery(const char *proc, const std::vector<db_param>& params);
 
   // Move to next result set.
   bool NextResult();
@@ -97,6 +104,7 @@ public:
 private:
   void run_initial_query();
   void execute_proc_common(const char *proc, struct db_params *params, size_t parm_count);
+  void execute_proc_common2(const char *proc, const std::vector<db_param>& params);
   static std::string fix_server(const std::string& str);
 
   std::string _user;

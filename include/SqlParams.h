@@ -14,11 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __DRS_SQLPARAMS_H__
-#define __DRS_SQLPARAMS_H__
+#ifndef DRS_SQLPARAMS_H
+#define DRS_SQLPARAMS_H
 
 namespace drs {
 
+// Legacy
 struct db_params {
   const char *name;
   unsigned char status;
@@ -28,11 +29,24 @@ struct db_params {
   const void *value;
 };
 
+// Legacy
 #define INT32_TYPE 1
 #define STRING_TYPE 2
 #define BOOL_TYPE 3
 #define BIT_TYPE 4
 
+enum class ParamType {
+  Int, Bit, String
+};
+
+struct db_param {
+  const char *name;
+  ParamType type;
+  int datalen;
+  const void *pvalue;
+  int ivalue;
+};
+
 }
 
-#endif /* __DRS_SQLPARAMS_H__ */
+#endif /* DRS_SQLPARAMS_H */

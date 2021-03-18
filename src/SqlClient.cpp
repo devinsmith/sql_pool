@@ -59,6 +59,20 @@ void SqlClient::ExecNonQuery(const char *proc, struct db_params *params, size_t 
   m_conn->ExecNonQuery(proc, params, parm_count);
 }
 
+void SqlClient::ExecStoredProc(const char *proc,
+    const std::vector<db_param>& params)
+{
+  Connect();
+  m_conn->ExecStoredProc(proc, params);
+}
+
+void SqlClient::ExecNonQuery(const char *proc,
+    const std::vector<db_param>& params)
+{
+  Connect();
+  m_conn->ExecNonQuery(proc, params);
+}
+
 void SqlClient::Dispose()
 {
   m_conn->Dispose();

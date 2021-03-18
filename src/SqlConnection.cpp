@@ -458,6 +458,26 @@ void SqlConnection::ExecNonQuery(const char *proc, struct db_params *params,
   Dispose();
 }
 
+void SqlConnection::ExecStoredProc(const char *proc,
+    const std::vector<db_param>& params)
+{
+  execute_proc_common2(proc, params);
+
+  int res = dbresults(_dbHandle);
+  if (res == FAIL)
+    throw std::runtime_error("Failed to get results");
+
+  if (res == NO_MORE_RESULTS)
+    _fetched_results = true;
+}
+
+void SqlConnection::ExecNonQuery(const char *proc,
+    const std::vector<db_param>& params)
+{
+  execute_proc_common2(proc, params);
+  Dispose();
+}
+
 
 std::string SqlConnection::fix_server(const std::string& str)
 {
@@ -528,6 +548,72 @@ void SqlConnection::execute_proc_common(const char *proc, struct db_params *para
       std::string error = "Failed to set parameter ";
       if (params[i].name != nullptr) {
         error += params[i].name;
+        error.append(1, ' ');
+      }
+      error += "on procedure ";
+      error += proc;
+      throw std::runtime_error(error);
+    }
+  }
+
+  if (dbrpcsend(_dbHandle) == FAIL)
+    throw std::runtime_error("Failed to send RPC");
+
+  // Wait for the server to return
+  if (dbsqlok(_dbHandle) == FAIL)
+    throw std::runtime_error(_error);
+
+  // FreeTDS's implementation of dblib does not always process the result of
+  // of the message handler. For instance there are situations where an error
+  // has occurred but dbsqlok returned success. In these situations we need to
+  // check the actual _error property and throw if it is not blank.
+  if (!_error.empty())
+    throw std::runtime_error(_error);
+}
+
+void SqlConnection::execute_proc_common2(const char *proc,
+    const std::vector<db_param>& params)
+{
+  Connect();
+
+  Dispose();
+
+  _fetched_rows = false;
+  _fetched_results = false;
+
+  if (dbrpcinit(_dbHandle, proc, 0) == FAIL) {
+    std::string error = "Failed to init stored procedure: ";
+    error += proc;
+    throw std::runtime_error(error);
+  }
+
+  for (const auto& param : params) {
+    int real_type = 0;
+    int data_len = 0;
+    BYTE *value = (BYTE *)&param.ivalue;
+
+    switch (param.type) {
+    case ParamType::Bit:
+      real_type = SYBBITN;
+      break;
+    case ParamType::Int:
+      real_type = SYBINT4;
+      break;
+    case ParamType::String:
+      real_type = SYBCHAR;
+      data_len = param.datalen;
+      value = (BYTE *)param.pvalue;
+      break;
+    default:
+      // Not reached?
+      throw std::runtime_error("Unknown stored procedure parameter type");
+    }
+
+    if (dbrpcparam(_dbHandle, param.name, 0,
+                   real_type, -1, param.datalen, value) == FAIL) {
+      std::string error = "Failed to set parameter ";
+      if (param.name != nullptr) {
+        error += param.name;
         error.append(1, ' ');
       }
       error += "on procedure ";
