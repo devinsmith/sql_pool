@@ -11,7 +11,9 @@ include_directories(include)
 LIST(APPEND srcs
   src/SqlClient.cpp
   src/SqlConnection.cpp
-  src/SqlConnectionFactory.cpp)
+  src/SqlConnectionFactory.cpp
+  src/SqlParams.cpp
+  )
 
 
 # Define library

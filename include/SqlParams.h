@@ -17,6 +17,9 @@
 #ifndef DRS_SQLPARAMS_H
 #define DRS_SQLPARAMS_H
 
+#include <string>
+#include <vector>
+
 namespace drs {
 
 // Legacy
@@ -45,6 +48,20 @@ struct db_param {
   int datalen;
   const void *pvalue;
   int ivalue;
+};
+
+class SqlParams {
+public:
+  void AddInt(const char *name, int ival);
+  void AddString(const char *name, const std::string& str);
+  void AddString(const char *name, const char *str, size_t sz);
+  void AddBool(const char *name, bool bval);
+
+  void AddNull(const char *name, ParamType type);
+
+  const std::vector<db_param>& ToVec() { return pvec; }
+private:
+  std::vector<db_param> pvec;
 };
 
 }
