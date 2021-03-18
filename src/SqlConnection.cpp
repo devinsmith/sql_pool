@@ -589,7 +589,6 @@ void SqlConnection::execute_proc_common2(const char *proc,
 
   for (const auto& param : params) {
     int real_type = 0;
-    int data_len = 0;
     BYTE *value = (BYTE *)&param.ivalue;
 
     switch (param.type) {
@@ -601,7 +600,6 @@ void SqlConnection::execute_proc_common2(const char *proc,
       break;
     case ParamType::String:
       real_type = SYBCHAR;
-      data_len = param.datalen;
       value = (BYTE *)param.pvalue;
       break;
     default:

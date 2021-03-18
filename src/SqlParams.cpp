@@ -24,6 +24,7 @@ void SqlParams::AddInt(const char *name, int ival)
   p.name = name;
   p.type = ParamType::Int;
   p.ivalue = ival;
+  p.datalen = -1;
 
   pvec.push_back(p);
 }
@@ -56,6 +57,7 @@ void SqlParams::AddBool(const char *name, bool bval)
   p.name = name;
   p.type = ParamType::Bit;
   p.ivalue = bval;
+  p.datalen = 1;
 
   pvec.push_back(p);
 }
