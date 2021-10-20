@@ -19,4 +19,5 @@ LIST(APPEND srcs
 # Define library
 add_library(sql_pool STATIC ${srcs})
 
-target_include_directories(sql_pool PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(sql_pool PUBLIC ${PROJECT_SOURCE_DIR}/include ${FreeTDS_INCLUDE_DIR})
+target_link_libraries(sql_pool PRIVATE ${FreeTDS_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
