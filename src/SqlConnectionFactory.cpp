@@ -26,6 +26,7 @@ namespace drs {
 void SqlConnectionFactory::release(SqlConnection *c)
 {
   std::lock_guard<std::mutex> locker(_mutex);
+  c->Dispose();
   sql_connections.push_back(c);
 }
 
