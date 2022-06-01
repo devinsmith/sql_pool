@@ -527,7 +527,7 @@ void SqlConnection::execute_proc_common(const char *proc, struct db_params *para
     throw std::runtime_error(error);
   }
 
-  for (int i = 0; i < parm_count; i++) {
+  for (size_t i = 0; i < parm_count; i++) {
     int real_type = 0;
 
     switch (params[i].type) {
