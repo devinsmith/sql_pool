@@ -635,5 +635,13 @@ void SqlConnection::execute_proc_common2(const char *proc,
     throw std::runtime_error(_error);
 }
 
+bool SqlConnection::ChangeDatabase(const std::string &newdb)
+{
+  if (dbuse(_dbHandle, newdb.c_str()) != FAIL) {
+    _database = newdb;
+    return true;
+  }
+  return false;
+}
 
 }

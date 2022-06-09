@@ -50,6 +50,10 @@ public:
   // It should not be necessary to call this method directly.
   void Connect();
 
+  // Changes the database on an existing connection, returns true
+  // if successful, false otherwise.
+  bool ChangeDatabase(const std::string& newdb);
+
   void Disconnect();
 
   // When a query is executed freetds buffers the results into a

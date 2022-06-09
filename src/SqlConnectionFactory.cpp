@@ -41,9 +41,15 @@ SqlConnection* SqlConnectionFactory::acquire(const std::string& user,
     std::lock_guard<std::mutex> locker(_mutex);
     for (auto it = sql_connections.begin(); it != sql_connections.end(); ++it) {
       c = *it;
-      if (c->Server() == server && c->Database() == database) {
-        sql_connections.erase(it);
-        return c;
+      // TODO: Consider username and password when acquiring from pool?
+      if (c->Server() == server) {
+        if (c->Database() == database) {
+          sql_connections.erase(it);
+          return c;
+        } else if (c->ChangeDatabase(database)) {
+          sql_connections.erase(it);
+          return c;
+        }
       }
     }
   }
