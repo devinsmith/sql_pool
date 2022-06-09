@@ -6,18 +6,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 find_package(Threads REQUIRED)
 find_package(FreeTDS REQUIRED)
 
-include_directories(include)
-
-LIST(APPEND srcs
+set(SOURCES
   src/SqlClient.cpp
   src/SqlConnection.cpp
   src/SqlConnectionFactory.cpp
-  src/SqlParams.cpp
-  )
+  src/SqlParams.cpp)
 
+set(HEADERS
+  include/SqlClient.h
+  include/SqlConnection.h
+  include/SqlConnectionFactory.h
+  include/SqlParams.h)
 
 # Define library
-add_library(sql_pool STATIC ${srcs})
+add_library(sql_pool STATIC ${SOURCES} ${HEADERS})
 
 target_include_directories(sql_pool PUBLIC ${PROJECT_SOURCE_DIR}/include ${FreeTDS_INCLUDE_DIR})
 target_link_libraries(sql_pool PRIVATE ${FreeTDS_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
