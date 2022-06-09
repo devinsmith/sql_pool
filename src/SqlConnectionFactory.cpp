@@ -55,8 +55,12 @@ SqlConnection* SqlConnectionFactory::acquire(const std::string& user,
   }
 
   // Make new connection.
-  //
-  printf("ConnectionFactory:: Making a new connection: %s - %s\n", server.c_str(), database.c_str());
+  std::string log_msg = "SqlConnectionFactory::acquire > Making a new connection: ";
+  log_msg += server;
+  log_msg += " - ";
+  log_msg += database;
+
+  sql_log(1, log_msg.c_str());
 
   c = new SqlConnection(user, pass, server, database);
   c->Connect();

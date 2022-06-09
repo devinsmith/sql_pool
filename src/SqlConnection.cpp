@@ -27,6 +27,8 @@
 
 namespace drs {
 
+static void (*g_log_func)(int level, const char *msg) = nullptr;
+
 // Sadly, FreeTDS does not seem to check the return value of this message
 // handler.
 extern "C" int
@@ -136,8 +138,15 @@ sql_db_err_handler(DBPROCESS *dbproc, int severity, int dberr,
   return INT_CANCEL;
 }
 
+void sql_log(int level, const char *msg)
+{
+  if (g_log_func != nullptr) {
+    g_log_func(level, msg);
+  }
+}
+
 // FreeTDS DBLib requires some initialization.
-void sql_startup()
+void sql_startup(void (*log_func)(int, const char *))
 {
   dbinit();
 
@@ -145,6 +154,7 @@ void sql_startup()
   dberrhandle(sql_db_err_handler);
 
   dbsetlogintime(5);
+  g_log_func = log_func;
 }
 
 void sql_shutdown()

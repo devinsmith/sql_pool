@@ -121,8 +121,9 @@ private:
   std::string _error;
 };
 
-void sql_startup();
+void sql_startup(void (*log_func)(int, const char *));
 void sql_shutdown();
+void sql_log(int level, const char *msg);
 
 }
 
