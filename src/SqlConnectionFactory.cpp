@@ -20,8 +20,7 @@
 #include "SqlConnection.h"
 #include "SqlConnectionFactory.h"
 
-namespace drs {
-
+namespace tds {
 
 void SqlConnectionFactory::release(SqlConnection *c)
 {

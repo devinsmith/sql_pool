@@ -21,7 +21,7 @@
 #include "SqlConnection.h"
 #include "SqlConnectionFactory.h"
 
-namespace drs {
+namespace tds {
 
 SqlClient::SqlClient(const std::string& user, const std::string& pass,
     const std::string& server, const std::string& database) :

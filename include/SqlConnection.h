@@ -14,8 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __DRS_SQLCONNECTION_H__
-#define __DRS_SQLCONNECTION_H__
+#ifndef TDS_SQLCONNECTION_H
+#define TDS_SQLCONNECTION_H
 
 #include <string>
 #include <vector>
@@ -26,7 +26,7 @@
 
 #include "SqlParams.h"
 
-namespace drs {
+namespace tds {
 
 class SqlConnection {
 public:
@@ -125,6 +125,6 @@ void sql_startup(void (*log_func)(int, const char *));
 void sql_shutdown();
 void sql_log(int level, const char *msg);
 
-}
+} // namespace tds
 
-#endif /* __DRS_SQLCONNECTION_H__ */
+#endif // TDS_SQLCONNECTION_H

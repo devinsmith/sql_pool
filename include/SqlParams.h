@@ -14,13 +14,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef DRS_SQLPARAMS_H
-#define DRS_SQLPARAMS_H
+#ifndef TDS_SQLPARAMS_H
+#define TDS_SQLPARAMS_H
 
 #include <string>
 #include <vector>
 
-namespace drs {
+namespace tds {
 
 // Legacy
 struct db_params {
@@ -66,4 +66,4 @@ private:
 
 }
 
-#endif /* DRS_SQLPARAMS_H */
+#endif // TDS_SQLPARAMS_H

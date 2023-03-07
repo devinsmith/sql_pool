@@ -25,7 +25,7 @@
 
 #include "SqlConnection.h"
 
-namespace drs {
+namespace tds {
 
 static void (*g_log_func)(int level, const char *msg) = nullptr;
 
@@ -38,9 +38,8 @@ sql_db_msg_handler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
   if (msgno == 5701 || msgno == 5703 || msgno == 5704)
     return 0;
 
-  auto *conn = reinterpret_cast<SqlConnection *>(dbgetuserdata(dbproc));
 
-  if (conn != nullptr) {
+  if (auto *conn = reinterpret_cast<SqlConnection *>(dbgetuserdata(dbproc)); conn != nullptr) {
     return conn->MsgHandler(dbproc, msgno, msgstate, severity, msgtext, srvname,
         procname, line);
   }
@@ -86,8 +85,7 @@ int SqlConnection::MsgHandler(DBPROCESS * dbproc, DBINT msgno, int msgstate,
         _error += std::to_string(line);
       }
       _error += "\n";
-      char *database = dbname(dbproc);
-      if (database != nullptr && *database != '\0') {
+      if (char const *database = dbname(dbproc); database != nullptr && *database != '\0') {
         _error += "Database '";
         _error += database;
         _error += "'\n";
@@ -498,8 +496,7 @@ std::string SqlConnection::fix_server(const std::string& str)
 
   // FreeTDS doesn't need the leading "tcp:" in some connection strings.
   // Remove it if it exists.
-  std::string tcp_prefix("tcp:");
-  if (clean_server.compare(0, tcp_prefix.size(), tcp_prefix) == 0)
+  if (std::string tcp_prefix("tcp:"); clean_server.compare(0, tcp_prefix.size(), tcp_prefix) == 0)
     clean_server = clean_server.substr(tcp_prefix.size());
 
   // Some people use commas instead of colon to separate the port number.

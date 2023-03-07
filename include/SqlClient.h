@@ -14,15 +14,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __DRS_SQLCLIENT_H__
-#define __DRS_SQLCLIENT_H__
+#ifndef TDS_SQLCLIENT_H
+#define TDS_SQLCLIENT_H
 
 #include <string>
 #include <vector>
 
 #include "SqlParams.h"
 
-namespace drs {
+namespace tds {
 
 class SqlConnection;
 
@@ -74,6 +74,6 @@ private:
   SqlConnection *m_conn;
 };
 
-}
+} // namespace tds
 
-#endif /* __DRS_SQLCLIENT_H__ */
+#endif // TDS_SQLCLIENT_H

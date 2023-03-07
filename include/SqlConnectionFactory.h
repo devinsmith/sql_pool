@@ -14,14 +14,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __DRS_SQLCONNECTIONFACTORY_H__
-#define __DRS_SQLCONNECTIONFACTORY_H__
+#ifndef TDS_SQLCONNECTIONFACTORY_H
+#define TDS_SQLCONNECTIONFACTORY_H
 
 #include <string>
 #include <list>
 #include <mutex>
 
-namespace drs {
+namespace tds {
 
 class SqlConnection;
 
@@ -51,6 +51,6 @@ private:
   std::list<SqlConnection*> sql_connections;
 };
 
-}
+} // namespace tds
 
-#endif /* __DRS_SQLCONNECTIONFACTORY_H__ */
+#endif // TDS_SQLCONNECTIONFACTORY_H

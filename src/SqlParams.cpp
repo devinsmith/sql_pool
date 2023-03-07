@@ -16,7 +16,7 @@
 
 #include "SqlParams.h"
 
-namespace drs {
+namespace tds {
 
 void SqlParams::AddInt(const char *name, int ival)
 {
