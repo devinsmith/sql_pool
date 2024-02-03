@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(sql_pool)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/)
 
 find_package(Threads REQUIRED)
 find_package(FreeTDS REQUIRED)
